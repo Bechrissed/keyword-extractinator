@@ -1,0 +1,15 @@
+{
+  "name": "keyword-extractinator",
+  "version": "1.0.0",
+  "description": "keyword extract",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mathjs": "^6.6.0",
+    "wink-pos-tagger": "^2.2.2"
+  }
+}
