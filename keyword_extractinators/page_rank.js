@@ -1,13 +1,14 @@
 var posTagger = require("wink-pos-tagger");
 var math = require("mathjs");
+var stopWords = require("./stopwords");
 
-const sentenceSplitter = content => {
-  console.log(`Splitting content into different sentences`);
+const sentenceSplitter = (content) => {
+  //console.log(`Splitting content into different sentences`);
 
   //regex for splitting content
   let splitContent = content.match(/[^\.!\?]+[\.!\?]+/g);
   try {
-    splitContent = splitContent.map(sent => {
+    splitContent = splitContent.map((sent) => {
       return sent.trim();
     });
     return splitContent;
@@ -20,8 +21,8 @@ const sentenceSplitter = content => {
   }
 };
 
-const posSentence = sentences => {
-  console.log(`POS Tagging of the sentences`);
+const posSentence = (sentences) => {
+  //og(`POS Tagging of the sentences`);
 
   //uses wink pos tagger: https://winkjs.org/wink-pos-tagger/
   //93.2% accuracy at 525k wps
@@ -35,17 +36,16 @@ const posSentence = sentences => {
     "NNS",
     "VBD",
     "NNP",
-    "NNPS"
+    "NNPS",
   ];
-  const stop_words = ["s", "—", "are"];
   var tagger = posTagger();
-  var posTaggedSentences = sentences.map(sentence => {
+  var posTaggedSentences = sentences.map((sentence) => {
     var tagged = tagger.tagSentence(sentence);
     var newSent = [];
     for (var i = 0; i < tagged.length; i++) {
       if (
         tags.includes(tagged[i].pos) &&
-        !stop_words.includes(tagged[i].value)
+        !stopWords.includes(tagged[i].value)
       ) {
         newSent.push(tagged[i].value);
       }
@@ -55,8 +55,8 @@ const posSentence = sentences => {
   return posTaggedSentences;
 };
 
-const getVocab = posSentences => {
-  console.log(`Getting the vocab`);
+const getVocab = (posSentences) => {
+  //console.log(`Getting the vocab`);
 
   //returns the vocabulary using the pos filtered sentences
   const vocab = [];
@@ -71,10 +71,10 @@ const getVocab = posSentences => {
 };
 
 const getTokenPairs = (sentences, windowSize = 4) => {
-  console.log(`Getting token pairs`);
+  //console.log(`Getting token pairs`);
 
   //return the token pairs
-  const token_pairs = sentences.map(sentence => {
+  const token_pairs = sentences.map((sentence) => {
     var sentenceTokenPairs = [];
     for (var i = 0; i < sentence.length; i++) {
       for (var j = i + 1; j < i + windowSize; j++) {
@@ -92,7 +92,7 @@ const getTokenPairs = (sentences, windowSize = 4) => {
   return token_pairs;
 };
 
-const zeroes = dimensions => {
+const zeroes = (dimensions) => {
   //create array of dimensions of zeroes
   var array = [];
   for (var i = 0; i < dimensions[0]; i++) {
@@ -101,7 +101,7 @@ const zeroes = dimensions => {
   return array;
 };
 
-const ones = dimensions => {
+const ones = (dimensions) => {
   //create array of dimensions of zeroes
   var array = [];
   for (var i = 0; i < dimensions[0]; i++) {
@@ -110,7 +110,7 @@ const ones = dimensions => {
   return array;
 };
 
-const transpose = array => {
+const transpose = (array) => {
   //transposes array
   var transposeArray = [];
   for (var i = 0; i < array.length; i++) {
@@ -125,7 +125,7 @@ const transpose = array => {
   return transposeArray;
 };
 
-const diag = array => {
+const diag = (array) => {
   //creates array with diag and zeroes
   var arrayLength = array.length;
   var newArray = zeroes([arrayLength, arrayLength]);
@@ -158,13 +158,13 @@ const subMatrix = (matrix1, matrix2) => {
   return newArray;
 };
 
-const symmetrize = matrix => {
+const symmetrize = (matrix) => {
   const added = addMatrix(matrix, transpose(matrix));
   const subtracted = subMatrix(added, diag(matrix));
   return subtracted;
 };
 
-const normalize = matrix => {
+const normalize = (matrix) => {
   const colCount = matrix[0].length;
   const colZeroes = zeroes([colCount]);
 
@@ -209,7 +209,7 @@ const addConstant = (matrix, constant) => {
   return matrix;
 };
 
-const sum = matrix => {
+const sum = (matrix) => {
   var val = 0;
   for (var i = 0; i < matrix.length; i++) {
     val += matrix[i];
@@ -218,7 +218,7 @@ const sum = matrix => {
 };
 
 const getMatrix = (vocab, tokenPairs) => {
-  console.log(`Building vocabulary matrix with token pairs`);
+  //console.log(`Building vocabulary matrix with token pairs`);
 
   //build the matrix
   var matrix = zeroes([vocab.length, vocab.length]);
@@ -258,13 +258,13 @@ const pageRankIteration = (
   for (var i = 0; i < vocab.length; i++) {
     node_weight.push({
       word: vocab[i],
-      value: pr[i]
+      value: pr[i],
     });
   }
   return node_weight;
 };
 
-const pageRank = content => {
+const pageRank = (content) => {
   const sentences = sentenceSplitter(content);
   const posSenctences = posSentence(sentences);
   const vocab = getVocab(posSenctences);
@@ -277,7 +277,7 @@ const pageRank = content => {
 const getTop = (content, n) => {
   const node_weight = pageRank(content);
   const top = node_weight
-    .sort(function(a, b) {
+    .sort(function (a, b) {
       return a.value < b.value ? 1 : -1;
     })
     .slice(0, n);
@@ -292,5 +292,5 @@ module.exports = {
   getMatrix: getMatrix,
   pageRankIteration: pageRankIteration,
   pageRank: pageRank,
-  top: getTop
+  top: getTop,
 };
