@@ -1711,7 +1711,7 @@ const posSentence = (sentences) => {
     for (var i = 0; i < tagged.length; i++) {
       if (
         tags.includes(tagged[i].pos) &&
-        !stopWords.stopWords.includes(tagged[i].value)
+        !stopWords.includes(tagged[i].value)
       ) {
         newSent.push(tagged[i].value);
       }
