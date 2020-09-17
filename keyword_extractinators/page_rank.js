@@ -1708,6 +1708,9 @@ const posSentence = (sentences) => {
       "zyner",
       "zyns",
     ];
+
+    // console.log(typeof stopWords);
+
     for (var i = 0; i < tagged.length; i++) {
       if (
         tags.includes(tagged[i].pos) &&
